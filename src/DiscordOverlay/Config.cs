@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -78,29 +78,32 @@ namespace DiscordOverlay
 
         public void Save()
         {
-            var directoryName = Path.GetDirectoryName(FileName);
-
-            if (!Directory.Exists(directoryName))
+            lock (this)
             {
-                Directory.CreateDirectory(directoryName);
+                var directoryName = Path.GetDirectoryName(FileName);
+
+                if (!Directory.Exists(directoryName))
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
+
+                var ns = new XmlSerializerNamespaces();
+                ns.Add(string.Empty, string.Empty);
+
+                var buffer = new StringBuilder();
+                using (var sw = new StringWriter(buffer))
+                {
+                    var xs = new XmlSerializer(typeof(Config));
+                    xs.Serialize(sw, this, ns);
+                }
+
+                buffer.Replace("utf-16", "utf-8");
+
+                File.WriteAllText(
+                    FileName,
+                    buffer.ToString() + Environment.NewLine,
+                    new UTF8Encoding(false));
             }
-
-            var ns = new XmlSerializerNamespaces();
-            ns.Add(string.Empty, string.Empty);
-
-            var buffer = new StringBuilder();
-            using (var sw = new StringWriter(buffer))
-            {
-                var xs = new XmlSerializer(typeof(Config));
-                xs.Serialize(sw, this, ns);
-            }
-
-            buffer.Replace("utf-16", "utf-8");
-
-            File.WriteAllText(
-                FileName,
-                buffer.ToString() + Environment.NewLine,
-                new UTF8Encoding(false));
         }
 
         public async void AutoSave()
@@ -198,6 +201,7 @@ namespace DiscordOverlay
 
         private readonly ObservableCollection<VoiceChannelPreset> voiceChannelPresets = new ObservableCollection<VoiceChannelPreset>();
 
+        [XmlArrayItem(ElementName = "Preset")]
         public ObservableCollection<VoiceChannelPreset> VoiceChannelPresets
         {
             get => this.voiceChannelPresets;

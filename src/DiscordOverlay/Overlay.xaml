@@ -1,4 +1,4 @@
-﻿<Window
+<Window
   x:Class="DiscordOverlay.Overlay"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,9 +7,16 @@
   xmlns:local="clr-namespace:DiscordOverlay"
   mc:Ignorable="d"
   Title="DISCORD Overlay"
-  Width="800" Height="450">
-  <Grid>
-    <!-- CEF WebBrowser -->
-    <Grid x:Name="WebGrid" />
-  </Grid>
+  RenderOptions.BitmapScalingMode="Fant"
+  RenderOptions.ClearTypeHint="Enabled"
+  RenderOptions.EdgeMode="Unspecified"
+  TextOptions.TextFormattingMode="Display"
+  TextOptions.TextHintingMode="Animated"
+  TextOptions.TextRenderingMode="ClearType"
+  d:DataContext="{d:DesignInstance Type=local:Overlay}"
+  DataContext="{Binding RelativeSource={RelativeSource Self}, Mode=OneWay}"
+  Left="{Binding Config.Left, Mode=TwoWay}" Top="{Binding Config.Top, Mode=TwoWay}"
+  Width="{Binding Config.Width, Mode=TwoWay}" Height="{Binding Config.Height, Mode=TwoWay}">
+  <!-- CEF WebBrowser -->
+  <Grid x:Name="WebGrid" />
 </Window>

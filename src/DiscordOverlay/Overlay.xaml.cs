@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -14,20 +14,36 @@ namespace DiscordOverlay
     /// </summary>
     public partial class Overlay : Window
     {
-        private static readonly string DiscordStreamKitBaseUri =
-            "https://streamkit.discordapp.com/overlay/voice/[server_id]/[channel_id]?text_size=[font_size]&limit_speaking=[is_limit_speaking]&small_avatars=[is_small_avatars]";
-
         public Overlay()
         {
             this.InitializeComponent();
             InitializeCef();
 
+            Config.Current.PropertyChanged += (_, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(Config.VoiceWidgetUri):
+                        this.SetUri();
+                        break;
+                }
+            };
+
             this.Loaded += (_, __) =>
             {
-                this.CefBrowser.Address = "https://discordapp.com/";
+                this.SetUri();
                 this.WebGrid.Children.Add(this.CefBrowser);
             };
         }
+
+        private void SetUri()
+        {
+            this.CefBrowser.Address = !string.IsNullOrEmpty(Config.Current.VoiceWidgetUri) ?
+                Config.Current.VoiceWidgetUri :
+                "about:blank";
+        }
+
+        public Config Config => Config.Current;
 
         private readonly Lazy<ChromiumWebBrowser> LazyCefBrowser = new Lazy<ChromiumWebBrowser>(() =>
         {
@@ -74,10 +90,10 @@ namespace DiscordOverlay
 
             settings.CachePath = Path.Combine(
                 Path.GetTempPath(),
-                "XIVNote");
+                "DISCORD Overlay");
             settings.LogFile = Path.Combine(
                 Path.GetTempPath(),
-                "XIVNote",
+                "DISCORD Overlay",
                 "browser.log");
             settings.LogSeverity = LogSeverity.Warning;
 

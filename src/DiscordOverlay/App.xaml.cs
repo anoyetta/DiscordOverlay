@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace DiscordOverlay
 {
@@ -13,6 +15,8 @@ namespace DiscordOverlay
         public App()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CefSharpResolver;
+
+            RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 
             this.Startup += this.App_Startup;
         }
