@@ -3,8 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
+using System.Windows.Media;
 using CefSharp;
 using CefSharp.Wpf;
+using Prism.Commands;
 using Prism.Mvvm;
 
 namespace DiscordOverlay
@@ -23,6 +25,10 @@ namespace DiscordOverlay
             {
                 switch (e.PropertyName)
                 {
+                    case nameof(Config.IsLayoutLocked):
+                        this.ApplyLayoutLock();
+                        break;
+
                     case nameof(Config.VoiceWidgetUri):
                         this.SetUri();
                         break;
@@ -31,16 +37,84 @@ namespace DiscordOverlay
 
             this.Loaded += (_, __) =>
             {
+                this.BackgroundTextGrid.Visibility = !string.IsNullOrEmpty(this.Config.BackgroundText) ?
+                    Visibility.Visible :
+                    Visibility.Collapsed;
+
+                this.ApplyLayoutLock();
                 this.SetUri();
                 this.WebGrid.Children.Add(this.CefBrowser);
+            };
+
+            this.MouseLeftButtonDown += (_, __) => this.StartDragMove();
+
+            this.LeftThumb.DragDelta += (_, e) =>
+            {
+                if (!this.Config.IsLayoutLocked)
+                {
+                    this.Left += e.HorizontalChange;
+                    this.Width -= e.HorizontalChange;
+                }
+            };
+
+            this.RightThumb.DragDelta += (_, e) =>
+            {
+                if (!this.Config.IsLayoutLocked)
+                {
+                    this.Width += e.HorizontalChange;
+                }
+            };
+
+            this.TopThumb.DragDelta += (_, e) =>
+            {
+                if (!this.Config.IsLayoutLocked)
+                {
+                    this.Top += e.VerticalChange;
+                    this.Height -= e.VerticalChange;
+                }
+            };
+
+            this.BottomThumb.DragDelta += (_, e) =>
+            {
+                if (!this.Config.IsLayoutLocked)
+                {
+                    this.Height += e.VerticalChange;
+                }
             };
         }
 
         private void SetUri()
         {
-            this.CefBrowser.Address = !string.IsNullOrEmpty(Config.Current.VoiceWidgetUri) ?
-                Config.Current.VoiceWidgetUri :
-                "about:blank";
+            if (!string.IsNullOrEmpty(Config.Current.VoiceWidgetUri))
+            {
+                this.CefBrowser.Address = Config.Current.VoiceWidgetUri;
+                this.CefBrowser.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                this.CefBrowser.Address = "about:blank";
+                this.CefBrowser.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void StartDragMove()
+        {
+            if (!this.Config.IsLayoutLocked)
+            {
+                this.DragMove();
+            }
+        }
+
+        private readonly SolidColorBrush SemiTransparent = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#01000000"));
+
+        private void ApplyLayoutLock()
+        {
+            this.ResizeMode = this.Config.IsLayoutLocked ?
+                ResizeMode.NoResize :
+                ResizeMode.CanResizeWithGrip;
+            this.Background = this.Config.IsLayoutLocked ?
+                Brushes.Transparent :
+                this.SemiTransparent;
         }
 
         public Config Config => Config.Current;
@@ -105,6 +179,21 @@ namespace DiscordOverlay
 
             // shutdown を仕込む
             App.Current.Exit += (_, __) => Cef.Shutdown();
+        }
+
+        private DelegateCommand _openOptionsCommand;
+
+        public DelegateCommand OpenOptionsCommand =>
+            this._openOptionsCommand ?? (this._openOptionsCommand = new DelegateCommand(this.ExecuteOpenOptionsCommand));
+
+        private void ExecuteOpenOptionsCommand()
+        {
+            var window = new OptionsWindow()
+            {
+                Owner = this
+            };
+
+            window.Show();
         }
     }
 

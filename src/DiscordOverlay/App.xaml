@@ -5,5 +5,9 @@
   xmlns:local="clr-namespace:DiscordOverlay"
   StartupUri="Overlay.xaml">
   <Application.Resources>
+    <ResourceDictionary>
+      <!-- Global Converters -->
+      <BooleanToVisibilityConverter x:Key="VisibilityConverter" />
+    </ResourceDictionary>
   </Application.Resources>
 </Application>

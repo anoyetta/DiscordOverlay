@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Prism.Commands;
 using Prism.Mvvm;
 
 namespace DiscordOverlay
@@ -13,7 +14,7 @@ namespace DiscordOverlay
     [Serializable]
     public class Config : BindableBase
     {
-        public static Config Current { get; private set; }
+        public static Config Current { get; private set; } = !WPFHelper.IsDesignMode ? null : new Config();
 
         private Config()
         {
@@ -117,7 +118,15 @@ namespace DiscordOverlay
                         return;
                     }
 
-                    this.isAutoSaving = true;
+                    lock (this)
+                    {
+                        if (this.isAutoSaving)
+                        {
+                            return;
+                        }
+
+                        this.isAutoSaving = true;
+                    }
 
                     await Task.Run(async () =>
                     {
@@ -199,7 +208,12 @@ namespace DiscordOverlay
             set => this.SetProperty(ref this.fontSize, value);
         }
 
-        private readonly ObservableCollection<VoiceChannelPreset> voiceChannelPresets = new ObservableCollection<VoiceChannelPreset>();
+        private readonly ObservableCollection<VoiceChannelPreset> voiceChannelPresets = !WPFHelper.IsDesignMode ?
+            new ObservableCollection<VoiceChannelPreset>() :
+            new ObservableCollection<VoiceChannelPreset>()
+            {
+                new VoiceChannelPreset() { Name = "Hojoring - VC1", ServerID = "347997949109731328", ChannelID = "628219088623370253" }
+            };
 
         [XmlArrayItem(ElementName = "Preset")]
         public ObservableCollection<VoiceChannelPreset> VoiceChannelPresets
@@ -228,6 +242,14 @@ namespace DiscordOverlay
         {
             get => this.voiceWidgetBaseUri;
             set => this.SetProperty(ref this.voiceWidgetBaseUri, value);
+        }
+
+        private string backgroundText = "DISCORD Overlay";
+
+        public string BackgroundText
+        {
+            get => this.backgroundText;
+            set => this.SetProperty(ref this.backgroundText, value);
         }
 
         [XmlIgnore]
@@ -264,6 +286,24 @@ namespace DiscordOverlay
             this.PropertyChanged += (_, __) => Config.Current?.AutoSave();
         }
 
+        private bool isCurrent;
+
+        [XmlIgnore]
+        public bool IsCurrent
+        {
+            get => this.isCurrent;
+            set
+            {
+                if (this.SetProperty(ref this.isCurrent, value))
+                {
+                    if (value)
+                    {
+                        Config.Current.CurrentVoiceChannelPresetName = this.Name;
+                    }
+                }
+            }
+        }
+
         private string name;
 
         [XmlAttribute(AttributeName = "name")]
@@ -289,6 +329,22 @@ namespace DiscordOverlay
         {
             get => this.channelID;
             set => this.SetProperty(ref this.channelID, value);
+        }
+
+        private DelegateCommand _removeCommand;
+
+        [XmlIgnore]
+        public DelegateCommand RemoveCommand =>
+            this._removeCommand ?? (this._removeCommand = new DelegateCommand(this.ExecuteRemoveCommand));
+
+        private void ExecuteRemoveCommand()
+        {
+            if (this.isCurrent)
+            {
+                Config.Current.CurrentVoiceChannelPresetName = string.Empty;
+            }
+
+            Config.Current.VoiceChannelPresets.Remove(this);
         }
     }
 }

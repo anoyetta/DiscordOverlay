@@ -13,10 +13,50 @@
   TextOptions.TextFormattingMode="Display"
   TextOptions.TextHintingMode="Animated"
   TextOptions.TextRenderingMode="ClearType"
+  WindowStyle="None"
+  AllowsTransparency="True"
+  ShowInTaskbar="False"
+  Background="#01000000"
+  ResizeMode="CanResizeWithGrip"
   d:DataContext="{d:DesignInstance Type=local:Overlay}"
   DataContext="{Binding RelativeSource={RelativeSource Self}, Mode=OneWay}"
   Left="{Binding Config.Left, Mode=TwoWay}" Top="{Binding Config.Top, Mode=TwoWay}"
   Width="{Binding Config.Width, Mode=TwoWay}" Height="{Binding Config.Height, Mode=TwoWay}">
-  <!-- CEF WebBrowser -->
-  <Grid x:Name="WebGrid" />
+
+  <Window.Resources>
+    <ContextMenu x:Key="MainMenu">
+      <MenuItem Header="Lock Layout" IsCheckable="True" IsChecked="{Binding Config.IsLayoutLocked, Mode=TwoWay}" />
+      <MenuItem Header="Show Speaking Users Only" IsCheckable="True" IsChecked="{Binding Config.IsLimitSpeaking, Mode=TwoWay}" />
+      <MenuItem Header="Small Avatars" IsCheckable="True" IsChecked="{Binding Config.IsSmallAvatars, Mode=TwoWay}" />
+      <Separator />
+      <MenuItem Header="Voice Channels" ItemsSource="{Binding Config.VoiceChannelPresets, Mode=OneWay}">
+        <MenuItem.ItemContainerStyle>
+          <Style TargetType="MenuItem">
+            <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            <Setter Property="Command" Value="{Binding Command}" />
+            <Setter Property="CommandParameter" Value="{Binding Name, Mode=OneWay}" />
+          </Style>
+        </MenuItem.ItemContainerStyle>
+      </MenuItem>
+      <Separator />
+      <MenuItem Header="More Options" Command="{Binding OpenOptionsCommand, Mode=OneWay}" />
+      <Separator />
+      <MenuItem Header="Exit" />
+    </ContextMenu>
+  </Window.Resources>
+
+  <Grid>
+    <Thumb Name="LeftThumb" Panel.ZIndex="100" HorizontalAlignment="Left" Width="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeWE" Opacity="0.5" />
+    <Thumb Name="RightThumb" Panel.ZIndex="100" HorizontalAlignment="Right" Width="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeWE" Opacity="0.5" />
+    <Thumb Name="TopThumb" Panel.ZIndex="100" VerticalAlignment="Top" Height="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeNS" Opacity="0.5" />
+    <Thumb Name="BottomThumb" Panel.ZIndex="100" VerticalAlignment="Bottom" Height="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeNS" Opacity="0.5" />
+
+    <Grid x:Name="BackgroundTextGrid" VerticalAlignment="Bottom">
+      <Border Background="Black" Opacity="0.4" CornerRadius="3" />
+      <TextBlock Text="{Binding Config.BackgroundText, Mode=OneWay}" Margin="8" FontSize="16" FontFamily="Arial" Foreground="Beige" ContextMenu="{StaticResource MainMenu}" />
+    </Grid>
+
+    <!-- CEF WebBrowser -->
+    <Grid x:Name="WebGrid" Panel.ZIndex="-100" />
+  </Grid>
 </Window>
