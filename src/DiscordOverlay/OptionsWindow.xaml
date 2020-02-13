@@ -1,4 +1,4 @@
-﻿<Window
+<Window
   x:Class="DiscordOverlay.OptionsWindow"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,7 +7,7 @@
   xmlns:local="clr-namespace:DiscordOverlay"
   mc:Ignorable="d"
   Title="Options - DISCORD Overlay"
-  Height="400" Width="660"
+  Height="400" Width="670"
   ResizeMode="NoResize"
   WindowStartupLocation="CenterOwner"
   d:DataContext="{d:DesignInstance {x:Type local:OptionsWindow}, IsDesignTimeCreatable=True}"
@@ -51,7 +51,7 @@
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
         <ItemsControl
-          ItemsSource="{Binding Config.VoiceChannelPresets, Mode=OneWay}"
+          ItemsSource="{Binding Config.VoiceChannelPresetsSorted, Mode=OneWay}"
           IsTabStop="False"
           Focusable="False">
 
@@ -64,7 +64,8 @@
                 IsChecked="{Binding IsCurrent, Mode=TwoWay}"
                 Focusable="False">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 2">
-                  <TextBox Margin="5 0 0 0" Text="{Binding Name, Mode=TwoWay}" Width="220" ToolTip="Name" />
+                  <TextBox Margin="5 0 0 0" Text="{Binding Order, Mode=TwoWay}" Width="20" ToolTip="Order" TextAlignment="Right" />
+                  <TextBox Margin="8 0 0 0" Text="{Binding Name, Mode=TwoWay}" Width="220" ToolTip="Name" />
                   <TextBox Margin="8 0 0 0" Text="{Binding ServerID, Mode=TwoWay}" Width="160" ToolTip="Server ID" />
                   <TextBox Margin="8 0 0 0" Text="{Binding ChannelID, Mode=TwoWay}" Width="160" ToolTip="Channel ID" />
 

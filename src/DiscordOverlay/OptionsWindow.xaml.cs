@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using Prism.Commands;
 
 namespace DiscordOverlay
@@ -24,6 +24,7 @@ namespace DiscordOverlay
         {
             this.Config.VoiceChannelPresets.Add(new VoiceChannelPreset()
             {
+                Order = this.Config.VoiceChannelPresets.Count + 1,
                 Name = "New Channel",
                 ServerID = string.Empty,
                 ChannelID = string.Empty

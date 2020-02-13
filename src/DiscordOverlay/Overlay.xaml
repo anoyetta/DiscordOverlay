@@ -27,8 +27,36 @@
   Width="{Binding Config.Width, Mode=TwoWay}" Height="{Binding Config.Height, Mode=TwoWay}">
 
   <Window.Resources>
-    <ContextMenu x:Key="MainMenu">
-      <MenuItem Header="Voice Channels" ItemsSource="{Binding Config.VoiceChannelPresets, Mode=OneWay}">
+    <ContextMenu x:Key="MainMenu" Placement="MousePoint">
+      <MenuItem Header="Voice Channels" ItemsSource="{Binding Config.VoiceChannelPresetsSorted, Mode=OneWay}">
+        <MenuItem.ItemContainerStyle>
+          <Style TargetType="MenuItem">
+            <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            <Setter Property="IsCheckable" Value="True" />
+            <Setter Property="IsChecked" Value="{Binding IsCurrent, Mode=TwoWay}" />
+          </Style>
+        </MenuItem.ItemContainerStyle>
+      </MenuItem>
+      <Separator />
+
+      <MenuItem Header="Hide" IsCheckable="True" IsChecked="{Binding Config.IsHide, Mode=TwoWay}" />
+      <MenuItem Header="Lock Layout" IsCheckable="True" IsChecked="{Binding Config.IsLayoutLocked, Mode=TwoWay}" />
+      <MenuItem Header="Show Speaking Users Only" IsCheckable="True" IsChecked="{Binding Config.IsLimitSpeaking, Mode=TwoWay}" />
+      <MenuItem Header="Small Avatars" IsCheckable="True" IsChecked="{Binding Config.IsSmallAvatars, Mode=TwoWay}" />
+      <Separator />
+
+      <MenuItem Header="Reload" Command="{Binding ReloadCommand, Mode=OneWay}" />
+      <MenuItem Header="Copy URI" Command="{Binding CopyUriCommand, Mode=OneWay}" />
+      <Separator />
+
+      <MenuItem Header="More Options" Command="{Binding OpenOptionsCommand, Mode=OneWay}" />
+      <Separator />
+
+      <MenuItem Header="Exit" Command="{Binding ExitCommand, Mode=OneWay}" />
+    </ContextMenu>
+
+    <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
+      <MenuItem Header="Voice Channels" ItemsSource="{Binding Config.VoiceChannelPresetsSorted, Mode=OneWay}">
         <MenuItem.ItemContainerStyle>
           <Style TargetType="MenuItem">
             <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
@@ -62,8 +90,8 @@
       Visibility="Visible"
       ToolTipText="DISCORD Overlay"
       IconSource="/Images/main.ico"
-      ContextMenu="{StaticResource MainMenu}"
-      MenuActivation="LeftOrRightClick" />
+      MenuActivation="LeftOrRightClick"
+      ContextMenu="{StaticResource TrayMenu}" />
 
     <Thumb Name="LeftThumb" Panel.ZIndex="100" HorizontalAlignment="Left" Width="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeWE" Opacity="0.5" />
     <Thumb Name="RightThumb" Panel.ZIndex="100" HorizontalAlignment="Right" Width="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeWE" Opacity="0.5" />

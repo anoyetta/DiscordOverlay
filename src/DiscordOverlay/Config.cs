@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Xml.Serialization;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -34,6 +36,7 @@ namespace DiscordOverlay
             };
 
             this.VoiceChannelPresets.CollectionChanged += (_, __) => this.AutoSave();
+            this.CreateViewSource();
         }
 
         public static readonly string FileName = Path.Combine(
@@ -217,11 +220,33 @@ namespace DiscordOverlay
             set => this.SetProperty(ref this.fontSize, value);
         }
 
+        private CollectionViewSource viewSource;
+
+        private void CreateViewSource()
+        {
+            var src = new CollectionViewSource()
+            {
+            };
+
+            src.Source = this.voiceChannelPresets;
+            src.IsLiveSortingRequested = true;
+
+            src.SortDescriptions.AddRange(new[]
+            {
+                new SortDescription(nameof(VoiceChannelPreset.Order), ListSortDirection.Ascending)
+            });
+
+            this.viewSource = src;
+        }
+
+        [XmlIgnore]
+        public ICollectionView VoiceChannelPresetsSorted => this.viewSource.View;
+
         private readonly ObservableCollection<VoiceChannelPreset> voiceChannelPresets = !WPFHelper.IsDesignMode ?
             new ObservableCollection<VoiceChannelPreset>() :
             new ObservableCollection<VoiceChannelPreset>()
             {
-                new VoiceChannelPreset() { Name = "Hojoring - VC1", ServerID = "347997949109731328", ChannelID = "628219088623370253" }
+                new VoiceChannelPreset() { Order = 1, Name = "Hojoring - VC1", ServerID = "347997949109731328", ChannelID = "628219088623370253" }
             };
 
         [XmlArrayItem(ElementName = "Preset")]
@@ -324,6 +349,15 @@ namespace DiscordOverlay
                     }
                 }
             }
+        }
+
+        private int order;
+
+        [XmlAttribute(AttributeName = "order")]
+        public int Order
+        {
+            get => this.order;
+            set => this.SetProperty(ref this.order, value);
         }
 
         private string name;
