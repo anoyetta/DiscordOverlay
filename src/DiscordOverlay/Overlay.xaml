@@ -85,6 +85,11 @@
   </Window.Resources>
 
   <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+
     <tb:TaskbarIcon
       x:Name="NotifyIcon"
       Visibility="Visible"
@@ -98,7 +103,7 @@
     <Thumb Name="TopThumb" Panel.ZIndex="100" VerticalAlignment="Top" Height="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeNS" Opacity="0.5" />
     <Thumb Name="BottomThumb" Panel.ZIndex="100" VerticalAlignment="Bottom" Height="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeNS" Opacity="0.5" />
 
-    <Grid x:Name="BackgroundTextGrid" VerticalAlignment="Bottom">
+    <Grid Grid.Row="0" x:Name="BackgroundTextGrid">
       <Border Background="Black" Opacity="0.4" CornerRadius="3" />
       <TextBlock
         Text="{Binding ChannelName, Mode=OneWay}"
@@ -110,6 +115,6 @@
     </Grid>
 
     <!-- CEF WebBrowser -->
-    <Grid x:Name="WebGrid" Panel.ZIndex="-100" />
+    <Grid Grid.Row="1" x:Name="WebGrid" Panel.ZIndex="-100" />
   </Grid>
 </Window>
