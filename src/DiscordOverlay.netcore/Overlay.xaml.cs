@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
@@ -33,9 +32,6 @@ namespace DiscordOverlay
 
         #endregion IOverlay
 
-        private static readonly System.Drawing.Icon MainIconLegacy =
-            new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/DiscordOverlay;component/Images/main.ico")).Stream);
-
         public Overlay()
         {
             this.InitializeComponent();
@@ -44,6 +40,24 @@ namespace DiscordOverlay
             this.ToNonActive();
             this.OverlayVisible = true;
 
+            Config.Current.PropertyChanged += (_, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(Config.IsHide):
+                        this.OverlayVisible = !Config.Current.IsHide;
+                        break;
+
+                    case nameof(Config.IsLayoutLocked):
+                        this.ApplyLayoutLock();
+                        break;
+
+                    case nameof(Config.VoiceWidgetUri):
+                        this.SetUri();
+                        break;
+                }
+            };
+
             this.Loaded += (_, __) =>
             {
                 this.SubscribeZOrderCorrector();
@@ -51,40 +65,10 @@ namespace DiscordOverlay
                 this.ApplyLayoutLock();
                 this.SetUri();
                 this.WebGrid.Children.Add(this.CefBrowser);
-
-                Config.Current.PropertyChanged += (s, e) =>
-                {
-                    switch (e.PropertyName)
-                    {
-                        case nameof(Config.IsHide):
-                            this.OverlayVisible = !Config.Current.IsHide;
-                            break;
-
-                        case nameof(Config.IsLayoutLocked):
-                            this.ApplyLayoutLock();
-                            break;
-
-                        case nameof(Config.VoiceWidgetUri):
-                            this.SetUri();
-                            break;
-                    }
-                };
-
-                if (!Config.Current.VoiceChannelPresets.Any())
-                {
-                    this.ExecuteOpenOptionsCommand();
-
-                    this.NotifyIcon.ShowBalloonTip(
-                        "はじめに (Getting Started)",
-                        "ボイスチャンネルを登録してください。\nRegister a voice channel first.",
-                        MainIconLegacy,
-                        true);
-                }
             };
 
             this.Closing += (_, __) =>
             {
-                this.NotifyIcon.Visibility = Visibility.Collapsed;
                 this.UnsubscribeZOrderCorrector();
             };
 

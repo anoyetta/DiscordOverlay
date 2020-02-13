@@ -58,7 +58,7 @@
 
   <Grid>
     <tb:TaskbarIcon
-      x:Name="NotifyIcon"
+      x:Name="myNotifyIcon"
       Visibility="Visible"
       ToolTipText="DISCORD Overlay"
       IconSource="/Images/main.ico"
