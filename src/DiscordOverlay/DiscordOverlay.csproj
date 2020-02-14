@@ -150,7 +150,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName)==Release (
-    del /q *.pdb
+    rmdir /q /s x86 &gt;nul
+    del /q /s *.pdb &gt;nul
+    del /q /s *.xml &gt;nul
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>
