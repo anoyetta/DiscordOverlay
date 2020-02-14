@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
@@ -44,13 +45,14 @@ namespace DiscordOverlay
             this.ToNonActive();
             this.OverlayVisible = true;
 
+            this.WebGrid.Children.Add(this.CefBrowser);
+
             this.Loaded += (_, __) =>
             {
                 this.SubscribeZOrderCorrector();
 
                 this.ApplyLayoutLock();
                 this.SetUri();
-                this.WebGrid.Children.Add(this.CefBrowser);
 
                 Config.Current.PropertyChanged += (s, e) =>
                 {
@@ -143,9 +145,11 @@ namespace DiscordOverlay
             }
             else
             {
+                var ver = Assembly.GetExecutingAssembly().GetName().Version;
+
                 this.CefBrowser.Address = "about:blank";
                 this.CefBrowser.Visibility = Visibility.Hidden;
-                this.ChannelName = Config.Current.BackgroundText;
+                this.ChannelName = $"{Config.Current.BackgroundText}";
             }
 
             this.BackgroundTextGrid.Visibility = !string.IsNullOrEmpty(this.ChannelName) ?
@@ -225,7 +229,7 @@ namespace DiscordOverlay
                 Path.GetTempPath(),
                 "DISCORD Overlay",
                 "browser.log");
-            settings.LogSeverity = LogSeverity.Warning;
+            settings.LogSeverity = LogSeverity.Disable;
 
             // GPUアクセラレータを切る
             settings.DisableGpuAcceleration();

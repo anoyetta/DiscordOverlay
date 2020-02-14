@@ -7,7 +7,7 @@
   xmlns:local="clr-namespace:DiscordOverlay"
   mc:Ignorable="d"
   Title="Options - DISCORD Overlay"
-  Height="400" Width="670"
+  Height="460" Width="670"
   ResizeMode="NoResize"
   WindowStartupLocation="CenterOwner"
   d:DataContext="{d:DesignInstance {x:Type local:OptionsWindow}, IsDesignTimeCreatable=True}"
@@ -37,9 +37,40 @@
       <CheckBox Margin="0 5 0 0" Content="Show Speaking Users Only" IsChecked="{Binding Config.IsLimitSpeaking, Mode=TwoWay}" />
       <CheckBox Margin="0 5 0 0" Content="Small Avatars" IsChecked="{Binding Config.IsSmallAvatars, Mode=TwoWay}" />
 
-      <StackPanel Margin="0 5 0 0" Orientation="Horizontal">
-        <TextBlock Text="Font Size" />
-        <TextBox Margin="10 0 0 0" HorizontalContentAlignment="Right" Width="60" Text="{Binding Config.FontSize, Mode=TwoWay}" />
+      <TextBlock Margin="0 5 0 0" Text="Font Size" />
+      <StackPanel Orientation="Horizontal">
+        <Slider
+          Focusable="False"
+          Width="590"
+          Margin="0 2 0 0"
+          Minimum="10"
+          Maximum="32"
+          LargeChange="1"
+          TickFrequency="1"
+          TickPlacement="Both"
+          Value="{Binding Config.FontSize, Mode=TwoWay}" />
+        <TextBlock
+          VerticalAlignment="Center"
+          Margin="10 0 0 0"
+          Text="{Binding Config.FontSize, Mode=OneWay, StringFormat=N0}" />
+      </StackPanel>
+
+      <TextBlock Margin="0 5 0 0" Text="Zoom Level" />
+      <StackPanel Orientation="Horizontal">
+        <Slider
+          Focusable="False"
+          Width="590"
+          Margin="0 2 0 0"
+          Minimum="0.5"
+          Maximum="1.5"
+          LargeChange="0.1"
+          TickFrequency="0.1"
+          TickPlacement="Both"
+          Value="{Binding Config.ZoomLevel, Mode=TwoWay}" />
+        <TextBlock
+          VerticalAlignment="Center"
+          Margin="10 0 0 0"
+          Text="{Binding Config.ZoomLevel, Mode=OneWay, StringFormat=N1}" />
       </StackPanel>
     </StackPanel>
 

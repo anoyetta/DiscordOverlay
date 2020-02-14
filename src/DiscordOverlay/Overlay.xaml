@@ -53,6 +53,8 @@
       <Separator />
 
       <MenuItem Header="Exit" Command="{Binding ExitCommand, Mode=OneWay}" />
+
+      <MenuItem Header="{Binding Config.AppVersionInfo, Mode=OneWay}" IsHitTestVisible="False" IsEnabled="False" />
     </ContextMenu>
 
     <ContextMenu x:Key="TrayMenu" Placement="MousePoint">
@@ -81,6 +83,8 @@
       <Separator />
 
       <MenuItem Header="Exit" Command="{Binding ExitCommand, Mode=OneWay}" />
+
+      <MenuItem Header="{Binding Config.AppVersionInfo, Mode=OneWay}" IsHitTestVisible="False" IsEnabled="False" />
     </ContextMenu>
   </Window.Resources>
 
@@ -93,7 +97,7 @@
     <tb:TaskbarIcon
       x:Name="NotifyIcon"
       Visibility="Visible"
-      ToolTipText="DISCORD Overlay"
+      ToolTipText="{Binding Config.AppVersionInfo, Mode=OneWay}"
       IconSource="/Images/main.ico"
       MenuActivation="LeftOrRightClick"
       ContextMenu="{StaticResource TrayMenu}" />
@@ -104,17 +108,28 @@
     <Thumb Name="BottomThumb" Panel.ZIndex="100" VerticalAlignment="Bottom" Height="2" BorderThickness="1.5" BorderBrush="Transparent" Cursor="SizeNS" Opacity="0.5" />
 
     <Grid Grid.Row="0" x:Name="BackgroundTextGrid">
-      <Border Background="Black" Opacity="0.4" CornerRadius="3" />
+      <Border Margin="2" Background="Black" Opacity="0.4" CornerRadius="3">
+        <Border.Effect>
+          <DropShadowEffect BlurRadius="2" Direction="0" ShadowDepth="0" Color="Black" Opacity="0.4" />
+        </Border.Effect>
+      </Border>
+
       <TextBlock
         Text="{Binding ChannelName, Mode=OneWay}"
         Margin="8"
-        FontSize="{Binding Config.FontSize, Mode=OneWay}"
+        FontSize="15"
         FontFamily="Arial, Yu Gothic UI, monospace"
         Foreground="Beige"
         ContextMenu="{StaticResource MainMenu}" />
     </Grid>
 
     <!-- CEF WebBrowser -->
-    <Grid Grid.Row="1" x:Name="WebGrid" Panel.ZIndex="-100" />
+    <Grid Grid.Row="1" x:Name="WebGrid" Panel.ZIndex="-100">
+      <Grid.LayoutTransform>
+        <ScaleTransform
+          ScaleX="{Binding Config.ZoomLevel, Mode=OneWay}"
+          ScaleY="{Binding Config.ZoomLevel, Mode=OneWay}" />
+      </Grid.LayoutTransform>
+    </Grid>
   </Grid>
 </Window>

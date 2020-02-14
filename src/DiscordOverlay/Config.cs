@@ -147,6 +147,15 @@ namespace DiscordOverlay
         private bool isLoaded;
         private volatile bool isAutoSaving;
 
+        [XmlIgnore]
+        public string AppName => "DISCORD Overlay";
+
+        [XmlIgnore]
+        public Version AppVersion => Assembly.GetExecutingAssembly().GetName().Version;
+
+        [XmlIgnore]
+        public string AppVersionInfo => $"{this.AppName} v{this.AppVersion}";
+
         private double left = 10;
 
         public double Left
@@ -218,6 +227,14 @@ namespace DiscordOverlay
         {
             get => this.fontSize;
             set => this.SetProperty(ref this.fontSize, value);
+        }
+
+        private double zoomLevel = 1.0;
+
+        public double ZoomLevel
+        {
+            get => this.zoomLevel;
+            set => this.SetProperty(ref this.zoomLevel, Math.Round(value, 1));
         }
 
         private CollectionViewSource viewSource;
