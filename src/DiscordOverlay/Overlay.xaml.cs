@@ -283,6 +283,7 @@ namespace DiscordOverlay
 
         private void ExecuteExitCommand()
         {
+            this.NotifyIcon.ContextMenu.IsOpen = false;
             this.Close();
         }
 
