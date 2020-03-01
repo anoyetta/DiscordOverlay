@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using CefSharp;
@@ -283,8 +284,11 @@ namespace DiscordOverlay
 
         private void ExecuteExitCommand()
         {
-            this.NotifyIcon.ContextMenu.IsOpen = false;
-            this.Close();
+            this.Dispatcher.InvokeAsync(async () =>
+            {
+                await Task.Delay(500);
+                this.Close();
+            });
         }
 
         #region INotifyPropertyChanged
