@@ -64,6 +64,14 @@ namespace DiscordOverlay
                         var data = xs.Deserialize(sr) as Config;
                         if (data != null)
                         {
+                            foreach (var ch in data.VoiceChannelPresets)
+                            {
+                                if (ch.UID == null || ch.UID == Guid.Empty)
+                                {
+                                    ch.UID = Guid.NewGuid();
+                                }
+                            }
+
                             Current = data;
                             Current.isLoaded = true;
                             Current.UpdateVoiceWidgetUri();
@@ -134,6 +142,8 @@ namespace DiscordOverlay
                     await Task.Run(async () =>
                     {
                         await Task.Delay(TimeSpan.FromSeconds(5));
+
+                        this.SaveLastestVoiceChannelUID();
                         this.Save();
                     });
                 }
@@ -286,6 +296,36 @@ namespace DiscordOverlay
             set => this.SetProperty(ref this.currentVoiceChannelPresetName, value);
         }
 
+        private Guid lastestVoiceChannelUID;
+
+        public Guid LastestVoiceChannelUID
+        {
+            get => this.lastestVoiceChannelUID;
+            set => this.SetProperty(ref this.lastestVoiceChannelUID, value);
+        }
+
+        public void SaveLastestVoiceChannelUID()
+        {
+            var ch = this.voiceChannelPresets.FirstOrDefault(x => x.IsCurrent);
+            if (ch != null)
+            {
+                this.LastestVoiceChannelUID = ch.UID;
+            }
+        }
+
+        public void LoadLastestVoiceChannelUID()
+        {
+            var uid = this.LastestVoiceChannelUID;
+            if (uid != null && uid != Guid.Empty)
+            {
+                var ch = this.voiceChannelPresets.FirstOrDefault(x => x.UID == uid);
+                if (ch != null)
+                {
+                    ch.IsCurrent = true;
+                }
+            }
+        }
+
         private string voiceWidgetBaseUri =
             "https://streamkit.discordapp.com/overlay/voice/[server_id]/[channel_id]?text_size=[font_size]&limit_speaking=[is_limit_speaking]&small_avatars=[is_small_avatars]";
 
@@ -337,37 +377,6 @@ namespace DiscordOverlay
             this.PropertyChanged += (_, __) => Config.Current?.AutoSave();
         }
 
-        private bool isCurrent;
-
-        [XmlIgnore]
-        public bool IsCurrent
-        {
-            get => this.isCurrent;
-            set
-            {
-                if (this.SetProperty(ref this.isCurrent, value))
-                {
-                    if (value)
-                    {
-                        Config.Current.CurrentVoiceChannelPresetName = this.Name;
-
-                        foreach (var preset in Config.Current.VoiceChannelPresets)
-                        {
-                            if (preset != this)
-                            {
-                                preset.IsCurrent = false;
-                            }
-                        }
-                    }
-
-                    if (!Config.Current.VoiceChannelPresets.Any(x => x.IsCurrent))
-                    {
-                        Config.Current.CurrentVoiceChannelPresetName = string.Empty;
-                    }
-                }
-            }
-        }
-
         private int order;
 
         [XmlAttribute(AttributeName = "order")]
@@ -402,6 +411,46 @@ namespace DiscordOverlay
         {
             get => this.channelID;
             set => this.SetProperty(ref this.channelID, value);
+        }
+
+        private Guid uid;
+
+        [XmlAttribute(AttributeName = "uid")]
+        public Guid UID
+        {
+            get => this.uid;
+            set => this.SetProperty(ref this.uid, value);
+        }
+
+        private bool isCurrent;
+
+        [XmlIgnore]
+        public bool IsCurrent
+        {
+            get => this.isCurrent;
+            set
+            {
+                if (this.SetProperty(ref this.isCurrent, value))
+                {
+                    if (value)
+                    {
+                        Config.Current.CurrentVoiceChannelPresetName = this.Name;
+
+                        foreach (var preset in Config.Current.VoiceChannelPresets)
+                        {
+                            if (preset != this)
+                            {
+                                preset.IsCurrent = false;
+                            }
+                        }
+                    }
+
+                    if (!Config.Current.VoiceChannelPresets.Any(x => x.IsCurrent))
+                    {
+                        Config.Current.CurrentVoiceChannelPresetName = string.Empty;
+                    }
+                }
+            }
         }
 
         private DelegateCommand _removeCommand;

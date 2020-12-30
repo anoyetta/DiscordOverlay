@@ -85,6 +85,11 @@ namespace DiscordOverlay
                 }
             };
 
+            this.ContentRendered += (_, __) =>
+            {
+                Config.Current.LoadLastestVoiceChannelUID();
+            };
+
             this.Closing += (_, __) =>
             {
                 this.NotifyIcon.Visibility = Visibility.Collapsed;
@@ -297,7 +302,7 @@ namespace DiscordOverlay
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void RaisePropertyChanged(
-            [CallerMemberName]string propertyName = null)
+            [CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(
                 this,
@@ -307,7 +312,7 @@ namespace DiscordOverlay
         protected virtual bool SetProperty<T>(
             ref T field,
             T value,
-            [CallerMemberName]string propertyName = null)
+            [CallerMemberName] string propertyName = null)
         {
             if (Equals(field, value))
             {
